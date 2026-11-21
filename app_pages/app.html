@@ -1,0 +1,361 @@
+<!doctype html>
+<html lang="en" data-page="app">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>App tools</title>
+<!-- The site's own styles, taken from its index.html when this page opens, so this page
+     always looks like the current site. -->
+<style id="siteCss"></style>
+<style>
+/* App tools: only what the site doesn't already have */
+.at-view{display:none}.at-view.on{display:block}
+.at-row{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:10px}
+.at-sum{font-size:.95rem;margin:10px 0 0}
+.at-sum b.bad{color:var(--warn)}.at-sum b.ok{color:#3fb950}
+.at-table{width:100%;border-collapse:collapse;margin-top:12px;font-size:.88rem}
+.at-table th{text-align:left;font-size:.75rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;padding:6px 8px;border-bottom:1px solid var(--border)}
+.at-table td{padding:7px 8px;border-bottom:1px solid #ffffff10;vertical-align:top}
+.at-table td.ln{color:var(--muted);white-space:nowrap;font-variant-numeric:tabular-nums}
+.at-sev{font-size:.72rem;font-weight:800;letter-spacing:.04em;padding:1px 6px;text-transform:uppercase}
+.at-sev.error{background:var(--warn);color:#2b0a06}.at-sev.check{background:#f5b301;color:#1b1400}
+.at-table td.fx{white-space:nowrap}
+.at-table td.fx button,.at-table td.fx select{padding:4px 8px;font-size:.85rem}
+.at-table td.fx select{width:auto;max-width:220px}
+.at-empty{color:var(--muted);font-size:.9rem;padding:10px 0}
+.at-warn{border:1px solid #f5b301;color:#f5b301;padding:8px 12px;font-size:.88rem;margin:0 0 12px}
+.at-path{font-family:Consolas,ui-monospace,monospace;font-size:.85rem;color:var(--muted);word-break:break-all}
+.at-msg{margin-top:10px;font-size:.88rem;min-height:1.2em;white-space:pre-wrap}
+.at-msg.ok{color:#3fb950}.at-msg.bad{color:var(--warn)}
+.at-backups{margin-top:8px}
+.at-backups .row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:6px 0;border-bottom:1px solid #ffffff10;font-family:Consolas,ui-monospace,monospace;font-size:.85rem}
+.at-backups .row button{font-family:inherit;padding:4px 10px}
+.hide{display:none!important}
+.at-table td.pic{width:40px;padding:3px 6px}
+.at-table td.pic img{width:34px;height:34px;object-fit:contain;display:block}
+.at-table td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+.at-table th.num{text-align:right}
+.at-rk{font-size:.72rem;font-weight:800;padding:1px 6px}
+.at-rk.S{background:#f5b301;color:#1b1400}.at-rk.A{background:#a46bff;color:#fff}.at-rk.B{background:#3d8bff;color:#fff}
+.at-muted{color:var(--muted)}
+/* wide like the site's Builder; Game save in two columns */
+main{max-width:min(1400px,calc(100vw - 32px))}
+.at-cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:16px;align-items:start}
+.at-cols > .card{margin-bottom:16px}
+.at-gap{margin-top:18px}
+@media (max-width:900px){.at-cols{grid-template-columns:1fr}}
+</style>
+</head>
+<body class="pg-cmd">
+<main>
+  <h1>App tools <a href="log.html" class="ver-tag" id="verTag"></a> <span class="game-tag" id="gameTag"></span></h1>
+  <p class="sub">The app's own tools: they read and write files on your PC, which a web page can't do.</p>
+  <nav class="pnav">
+    <a href="index.html">.zon Builder</a>
+    <a href="guides.html">Guides</a>
+    <a href="app.html" class="on">App tools</a>
+  </nav>
+  <div class="at-muted" id="gfx" style="font-size:.78rem;margin:0 0 8px"></div>
+  <div class="tabs">
+    <button type="button" class="tab active" data-v="check">Check file</button>
+    <button type="button" class="tab" data-v="game">Game save</button>
+    <button type="button" class="tab" data-v="data">Game data</button>
+  </div>
+
+  <!-- ===== Check file ===== -->
+  <section class="at-view on" id="v-check">
+    <div class="card" id="cLock" hidden>
+      <h2>Check file is locked</h2>
+      <p class="sub" style="margin:6px 0 12px">Pick your Remielle server's <b>remielle.exe</b> first. Files are checked against the names and data in your own remielle.exe, so the check always matches your server.</p>
+      <button type="button" class="primary" id="cLockPick">Pick remielle.exe&hellip;</button>
+    </div>
+    <div class="card" id="cMain">
+      <h2>Check file</h2>
+      <p class="sub" style="margin-bottom:10px">Checks a Remielle player file (.zon) the way Remielle's server does, and fixes what it finds. Fix all never removes anything and never adds new characters &mdash; those only happen when you click their own button.</p>
+      <div class="at-row">
+        <button type="button" class="primary" id="ckOpen">Open .zon&hellip;</button>
+        <input type="file" id="ckFile" accept=".zon,text/plain" class="hide">
+        <button type="button" id="ckFixAll" disabled>Fix all</button>
+        <button type="button" id="ckSave" disabled>Save fixed copy&hellip;</button>
+      </div>
+      <div class="at-sum" id="ckSum"></div>
+      <div class="at-msg" id="ckMsg"></div>
+      <div id="ckList"></div>
+    </div>
+  </section>
+
+  <!-- ===== Game save ===== -->
+  <section class="at-view" id="v-game">
+    <div class="at-msg" id="gMsg" style="margin:0 0 10px"></div>
+    <div class="at-cols">
+      <div class="card">
+        <h2>Server &amp; game</h2>
+        <label>Server's remielle.exe (with remielle-storage next to it)</label>
+        <div class="at-path" id="gExe">&mdash;</div>
+        <div class="at-row"><button type="button" id="gPick">Pick remielle.exe&hellip;</button></div>
+        <label class="at-gap">Server</label>
+        <div class="at-path" id="gSrv">&mdash;</div>
+        <div class="at-row">
+          <button type="button" class="primary" id="gSrvStart" title="Runs remielle.exe in its own command window, from the game folder">Start server</button>
+          <button type="button" id="gSrvStop" title="Presses Ctrl+C in the server's window so it shuts down cleanly">Stop server</button>
+        </div>
+        <label class="at-gap">Game (beta) &mdash; the remielle-bootstrap in your CNBetaWin folder (it asks for admin rights: click Yes on Windows' prompt)</label>
+        <div class="at-path" id="gCli">&mdash;</div>
+        <div class="at-row">
+          <button type="button" id="gCliPick">Pick remielle-bootstrap&hellip;</button>
+          <button type="button" class="primary" id="gCliStart">Start game</button>
+          <button type="button" class="primary" id="gBoth" title="Starts the server, then the game">Start server + game</button>
+        </div>
+      </div>
+      <div class="card">
+        <h2>Game save</h2>
+        <p class="sub" style="margin-bottom:10px">Reads your save out of the game into Check file, and packs a checked file back in &mdash; using Remielle's own <code>print-player</code> and <code>pack-player</code>. The save is only replaced after the new one has been packed and read back, and the old one is always backed up first.</p>
+        <div class="at-warn">After packing or restoring, log out and back in to the game to see the change (the server can stay open).</div>
+        <label>Player</label>
+        <select id="gPlayer" style="max-width:260px"></select>
+        <div class="at-row">
+          <button type="button" class="primary" id="gRead">Read into Check file</button>
+          <button type="button" class="primary" id="gEdit" title="Reads the save and opens it in the site's .zon editor; pack it back from there with Pack into game">Read into .zon editor</button>
+          <button type="button" id="gPack">Pack Check file into the save&hellip;</button>
+          <button type="button" id="gCheck" title="Reads the save as it is now and compares it, character by character, with what the app packed last">Check the save</button>
+        </div>
+        <div class="at-msg" id="gFile"></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>Backups</h2>
+      <p class="sub" style="margin-bottom:6px">Newest first (times in UTC). Restoring backs up the current save first, so it can be undone too. Backups are never deleted by the app.</p>
+      <div class="at-backups" id="gBackups"></div>
+    </div>
+  </section>
+  <!-- ===== Game data ===== -->
+  <section class="at-view" id="v-data">
+    <div class="card">
+      <h2>Game data <span class="count" id="dCount"></span></h2>
+      <p class="sub" style="margin-bottom:10px">Level-60 base stats read straight from your remielle.exe (the game's own formula: level 1 + growth &times; 59 levels + rank-6 ascension). Pick remielle.exe in Game save first.</p>
+      <input type="text" id="dFind" class="err-search" placeholder="Search characters and W-Engines&hellip;" autocomplete="off">
+      <div class="at-msg" id="dMsg"></div>
+      <h2 style="margin-top:14px">Exe vs site <span class="count" id="sCount"></span></h2>
+      <p class="sub" style="margin-bottom:6px">What your remielle.exe has that the site doesn't, and level-60 numbers that differ from the site's. Nothing is changed &mdash; this is a list to check.</p>
+      <div id="dSync"></div>
+      <h2 style="margin-top:18px">Characters</h2>
+      <div id="dChars"></div>
+      <h2 style="margin-top:18px">W-Engines</h2>
+      <div id="dWengs"></div>
+    </div>
+  </section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+async function api(path,body){
+  const r=await fetch("/api"+path,body===undefined?{}:{method:"POST",body:JSON.stringify(body)});
+  return r.json();
+}
+// the site's styles, version and game tags, taken from its index.html
+fetch("index.html").then(r=>r.text()).then(t=>{
+  const m=t.match(/<style>([\s\S]*?)<\/style>/);if(m)$("siteCss").textContent=m[1];
+  const v=t.match(/class="ver-tag">([^<]*)</);if(v)$("verTag").textContent=v[1];
+  const g=t.match(/class="game-tag"[^>]*>([^<]*)</);if(g)$("gameTag").textContent=g[1];
+  // each character's specialty (Attack, Anomaly, Rupture, Armorer, ...) as the site lists it
+  // the site's own lists, for Exe vs site
+  const arr=k=>{const m=t.match(new RegExp("\\b"+k+"=(\\[\\[[\\s\\S]*?\\]\\]);"));try{return m?JSON.parse(m[1]):[]}catch(e){return []}};
+  for(const k of ["CHARS_S","CHARS_A"])for(const [id,name] of arr(k))SITE.chars[id]=name;
+  for(const k of ["WENGS_S","WENGS_A"])for(const [id,name] of arr(k))SITE.wengs[id]=name;
+  const cb=t.match(/CHAR_BASE=\{([\s\S]*?)\n\s*\};?/);
+  if(cb)for(const m of cb[1].matchAll(/"(\d+)":(\[\[.*?\]\]),?/g)){try{SITE.base[m[1]]=Object.fromEntries(JSON.parse(m[2]))}catch(e){}}
+  for(const m of t.matchAll(/"(\d+)":\{base:(\[\[[^\]]*\],\[[^\]]*\]\])/g)){try{SITE.winfo[m[1]]=JSON.parse(m[2])}catch(e){}}
+  const sp=t.match(/CHAR_SPEC=(\{[^}]*\})/);if(sp){try{SPEC=JSON.parse(sp[1])}catch(e){}}
+  // characters that don't use Energy have "Automatic Sharpness / Adrenaline Accumulation" in
+  // that slot instead (the site's CHAR_BASE rows)
+  for(const m of t.matchAll(/"(\d+)":\[\[[^\n]*?\["(Automatic (\w+) Accumulation)","([^"]*)"\]/g))ACC[m[1]]={full:m[2],kind:m[3],v:m[4]};
+  dataRender();
+});
+let SPEC={},ACC={},SITE={chars:{},wengs:{},base:{},winfo:{}};
+// tabs
+document.querySelectorAll(".tabs .tab").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll(".tabs .tab").forEach(x=>x.classList.toggle("active",x===b));
+  document.querySelectorAll(".at-view").forEach(v=>v.classList.toggle("on",v.id==="v-"+b.dataset.v));
+  if(b.dataset.v==="game")gameRefresh();else if(b.dataset.v==="data")dataLoad();else ckRender(null);
+});
+
+/* ---------- Check file ---------- */
+let CK=null;
+function msg(el,t,ok){el.textContent=t||"";el.className="at-msg"+(t?(ok?" ok":" bad"):"")}
+async function ckRender(r){
+  if(!r)r=await api("/check/report");
+  CK=r;
+  $("ckFixAll").disabled=!r.open||!r.problems.some(p=>p.fix&&!p.manual);
+  $("ckSave").disabled=!r.open;
+  if(!r.open){$("ckSum").textContent="";$("ckList").innerHTML='<div class="at-empty">Open a .zon file, or read one from the game in Game save.</div>';return}
+  const checks=r.problems.length-r.errors;
+  $("ckSum").innerHTML=`<b>${esc(r.name||"player.zon")}</b> &middot; `+(r.errors?`<b class="bad">${r.errors} error${r.errors===1?"":"s"}</b>`:`<b class="ok">no errors</b>`)+(checks?` &middot; ${checks} to check`:"")+(r.fixes_applied?` &middot; ${r.fixes_applied} fix${r.fixes_applied===1?"":"es"} applied`:"");
+  if(r.message)msg($("ckMsg"),r.message,true);
+  if(!r.problems.length){$("ckList").innerHTML='<div class="at-empty">Nothing to fix &mdash; Remielle will accept this file.</div>';return}
+  $("ckList").innerHTML=`<table class="at-table"><thead><tr><th>Line</th><th></th><th>Problem</th><th></th></tr></thead><tbody>`+
+    r.problems.map(p=>`<tr><td class="ln">${p.line}:${p.col}</td><td><span class="at-sev ${p.sev}">${p.sev}</span></td><td>${esc(p.msg)}</td><td class="fx">`+
+      (p.fix?`<button type="button" data-fix="${p.i}"${p.manual?' class=""':' class="primary"'}>${esc(p.fix)}</button> `:"")+
+      (p.choices.length?`<select data-pick="${p.i}"><option value="">Pick&hellip;</option>${p.choices.map((c,ci)=>`<option value="${ci}">${esc(c)}</option>`).join("")}</select>`:"")+
+    `</td></tr>`).join("")+`</tbody></table>`;
+  $("ckList").querySelectorAll("[data-fix]").forEach(b=>b.onclick=async()=>ckRender(await api("/check/fix",{i:+b.dataset.fix})));
+  $("ckList").querySelectorAll("[data-pick]").forEach(s=>s.onchange=async()=>{if(s.value!=="")ckRender(await api("/check/fix",{i:+s.dataset.pick,choice:+s.value}))});
+}
+$("ckOpen").onclick=()=>$("ckFile").click();
+$("ckFile").onchange=async e=>{
+  const f=e.target.files&&e.target.files[0];if(!f)return;
+  const text=await f.text();e.target.value="";
+  msg($("ckMsg"),"");
+  ckRender(await api("/check/open",{name:f.name,text}));
+};
+$("ckFixAll").onclick=async()=>ckRender(await api("/check/fixall",{}));
+$("ckSave").onclick=async()=>{
+  const t=await (await fetch("/api/check/text")).text();
+  const name=(CK&&CK.name?CK.name.replace(/\.zon$/i,""):"player")+"-fixed.zon";
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([t],{type:"text/plain"}));a.download=name;
+  document.body.appendChild(a);a.click();a.remove();
+};
+
+/* ---------- Game save ---------- */
+let G=null;
+function gameRender(s){
+  G=s;
+  $("gExe").textContent=s.exe||"not picked yet";
+  const sel=$("gPlayer");
+  sel.innerHTML=s.players.length?s.players.map(id=>`<option value="${id}"${id===s.player?" selected":""}>Player ${id}</option>`).join(""):'<option value="">no saves found</option>';
+  sel.disabled=!s.players.length;
+  $("gRead").disabled=!s.exe||!s.players.length;
+  $("gEdit").disabled=!s.exe||!s.players.length;
+  $("cLock").hidden=!!s.exe;$("cMain").hidden=!s.exe;
+  $("gCheck").disabled=!s.exe||!s.players.length;
+  $("gPack").disabled=!s.exe||!s.file_open||s.file_errors>0;
+  $("gSrv").textContent=!s.exe?"pick remielle.exe first":s.server?"\u25cf running (in its own window)":"stopped";
+  $("gSrv").style.color=s.server?"#5fd38a":"";
+  $("gSrvStart").disabled=!s.exe||s.server;$("gSrvStop").disabled=!s.server;
+  $("gCli").textContent=s.client||"not picked yet";
+  $("gCliStart").disabled=!s.client;$("gBoth").disabled=!s.client||!s.exe||s.server;
+  $("gFile").textContent=!s.file_open?"To pack: open or read a file in Check file first.":s.file_errors?`Check file shows ${s.file_errors} error${s.file_errors===1?"":"s"} — fix ${s.file_errors===1?"it":"them"} first; a file with errors is never packed.`:`Will pack: ${s.file_name}`;
+  $("gFile").className="at-msg"+(s.file_open&&s.file_errors?" bad":"");
+  if(s.message)msg($("gMsg"),s.message,s.ok);
+  $("gBackups").innerHTML=s.backups.length?s.backups.map(b=>`<div class="row"><span>${esc(b)}</span><button type="button" data-restore="${esc(b)}">Restore&hellip;</button></div>`).join(""):'<div class="at-empty">No backups for this player yet &mdash; one is made every time the save is replaced.</div>';
+  $("gBackups").querySelectorAll("[data-restore]").forEach(b=>b.onclick=async()=>{
+    if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent="Click again to restore";b.classList.add("primary");setTimeout(()=>{b.dataset.arm="";b.textContent="Restore…";b.classList.remove("primary")},4000);return}
+    gameRender(await api("/game/restore",{name:b.dataset.restore}));
+  });
+}
+async function gameRefresh(){gameRender(await api("/game/state"))}
+$("gSrvStart").onclick=async()=>gameRender(await api("/game/server-start",{}));
+$("gCheck").onclick=async()=>{$("gCheck").disabled=true;gameRender(await api("/game/check-save",{}));$("gCheck").disabled=false};
+$("cLockPick").onclick=async()=>gameRender(await api("/game/pick-exe",{}));
+$("gCliPick").onclick=async()=>gameRender(await api("/game/pick-client",{}));
+$("gCliStart").onclick=async()=>gameRender(await api("/game/client-start",{}));
+$("gBoth").onclick=async()=>{const s=await api("/game/server-start",{});gameRender(s);if(!s.ok)return;
+  setTimeout(async()=>gameRender(await api("/game/client-start",{})),2000)}; // give the server a moment first
+$("gSrvStop").onclick=async()=>{$("gSrvStop").disabled=true;$("gSrv").textContent="stopping\u2026";gameRender(await api("/game/server-stop",{}))};
+// notice when the server's window is closed by hand (only while the Game save tab is shown)
+setInterval(async()=>{if(G&&G.server&&!document.hidden&&$("v-game").classList.contains("on")){const s=await api("/game/state");if(!s.server)gameRender(s)}},3000);
+$("gPick").onclick=async()=>{gameRender(await api("/game/pick-exe",{}));D=null};
+$("gPlayer").onchange=async()=>gameRender(await api("/game/player",{id:+$("gPlayer").value}));
+$("gRead").onclick=async()=>{const s=await api("/game/read",{});gameRender(s);if(s.ok)msg($("gMsg"),s.message+" Open the Check file tab to see it.",true)};
+// Read the save into the site's .zon editor (its saved state, localStorage zzz_exp_zon), then
+// open the editor. If the editor already holds a loaded or edited file, a second click is needed.
+$("gEdit").onclick=async()=>{
+  const b=$("gEdit");
+  let cur=null;try{cur=JSON.parse(localStorage.getItem("zzz_exp_zon")||"null")}catch(e){}
+  const busyFile=cur&&cur.file&&(cur.src!=="template"||(cur.changed||[]).length);
+  if(busyFile&&b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent=`Click again: replaces ${cur.fname||"the file"} in the .zon editor`;setTimeout(()=>{b.dataset.arm="";b.textContent="Read into .zon editor"},4000);return}
+  b.dataset.arm="";b.textContent="Reading\u2026";b.disabled=true;
+  const s=await api("/game/read",{});gameRender(s);
+  b.textContent="Read into .zon editor";
+  if(!s.ok)return;
+  const raw=await (await fetch("/api/check/text")).text();
+  const crlf=raw.includes("\r\n"),file=raw.replace(/\r\n/g,"\n");
+  try{localStorage.setItem("zzz_exp_zon",JSON.stringify({file,base:file,fname:s.file_name||`${s.player}.zon`,src:"game",crlf,changed:[]}))}
+  catch(e){msg($("gMsg"),"Couldn't hand the file to the .zon editor: "+e,false);return}
+  try{sessionStorage.setItem("zzz_app_open_zon","1")}catch(e){}
+  location.href="index.html";
+};
+$("gPack").onclick=async()=>{
+  const b=$("gPack");
+  if(b.dataset.arm!=="1"){b.dataset.arm="1";b.textContent=`Click again: replace player ${G.player}'s save`;b.classList.add("primary");setTimeout(()=>{b.dataset.arm="";b.textContent="Pack Check file into the save…";b.classList.remove("primary")},4000);return}
+  b.dataset.arm="";b.textContent="Packing…";b.disabled=true;
+  gameRender(await api("/game/pack",{}));
+  b.textContent="Pack Check file into the save…";
+};
+/* ---------- Game data ---------- */
+let D=null;
+const n=v=>Number.isInteger(v)?v.toLocaleString("en-US"):String(Math.round(v*100)/100);
+const pic=id=>`<img src="assets/img/${id}.webp" alt="" onerror="this.remove()">`;
+function dataRender(){
+  if(!D)return;
+  syncRender();
+  const q=$("dFind").value.toLowerCase().trim();
+  const hit=(name,id)=>!q||name.toLowerCase().includes(q)||String(id).includes(q);
+  const cs=D.characters.filter(c=>hit(c.name,c.id)),ws=D.wengines.filter(w=>w.rank!=="B"&&hit(w.name,w.id)); // B-rank: left out, like on the site
+  $("dCount").textContent=D.characters.length?`${D.characters.length} characters \u00b7 ${D.wengines.filter(w=>w.rank!=="B").length} W-Engines`:"";
+  $("dChars").innerHTML=cs.length?`<table class="at-table"><thead><tr><th></th><th>Character</th><th>Specialty</th><th class="num">HP</th><th class="num">ATK</th><th class="num">DEF</th><th class="num">Impact</th><th class="num">CRIT Rate</th><th class="num">CRIT DMG</th><th class="num">AM</th><th class="num">AP</th><th class="num" title="Energy Regen, or Automatic Sharpness / Adrenaline Accumulation for characters that don't use Energy">Energy Regen</th>${D.has_skins?'<th title="skin_id values for the .zon (0 = no skin), from remielle.exe">Skins (skin_id)</th>':""}</tr></thead><tbody>`+
+    cs.map(c=>`<tr><td class="pic">${pic(c.id)}</td><td>${esc(c.name)} <span class="at-muted">(${c.id})</span></td><td>${esc(SPEC[c.id]||"")}</td><td class="num">${n(c.hp)}</td><td class="num">${n(c.atk)}</td><td class="num">${n(c.def)}</td><td class="num">${n(c.impact)}</td><td class="num">${n(c.crit_rate)}%</td><td class="num">${n(c.crit_dmg)}%</td><td class="num">${c.anomaly_mastery}</td><td class="num">${c.anomaly_proficiency}</td><td class="num">${c.energy_regen!=null?n(c.energy_regen):ACC[c.id]?`<span title="${esc(ACC[c.id].full)}">${esc(ACC[c.id].v)} <span class="at-muted">${esc(ACC[c.id].kind)}</span></span>`:`<span class="at-muted" title="Doesn't use Energy">\u2014</span>`}</td>${D.has_skins?`<td class="at-muted">${c.skins.length?c.skins.join(", "):"\u2014"}</td>`:""}</tr>`).join("")+`</tbody></table>`:'<div class="at-empty">No characters'+(q?" match.":" yet.")+'</div>';
+  $("dWengs").innerHTML=ws.length?`<table class="at-table"><thead><tr><th></th><th>W-Engine</th><th>Rank</th><th>Base stat</th><th class="num"></th><th>Advanced stat</th><th class="num"></th></tr></thead><tbody>`+
+    ws.map(w=>`<tr><td class="pic">${pic(w.id)}</td><td>${w.known?esc(w.name):`<span class="at-muted">${esc(w.name)}</span>`} <span class="at-muted">(${w.id})</span></td><td><span class="at-rk ${w.rank}">${w.rank}</span></td><td>${esc(w.base_stat)}</td><td class="num">${n(w.base)}</td><td>${esc(w.adv_stat)}</td><td class="num">${n(w.adv)}${w.adv_pct?"%":""}</td></tr>`).join("")+`</tbody></table>`:'<div class="at-empty">No W-Engines'+(q?" match.":" yet.")+'</div>';
+}
+// Exe vs site: missing entries and numbers that differ (the site's level-60 values)
+// Numbers where the exe disagrees but the site's value was confirmed in game
+const CONFIRMED={"1491/Base Energy Regen":1}; // Sunna: exe says 1.2, in game it's 1
+const num=v=>{const x=parseFloat(String(v).replace(/[,%]/g,""));return isNaN(x)?null:x};
+function syncRows(){
+  const rows=[];
+  if(!D||!D.characters.length||!Object.keys(SITE.chars).length)return null;
+  const CS=[["Base HP","hp"],["Base ATK","atk"],["Base DEF","def"],["Base Impact","impact"],["CRIT Rate","crit_rate"],["CRIT DMG","crit_dmg"],["Anomaly Mastery","anomaly_mastery"],["Anomaly Proficiency","anomaly_proficiency"],["Base Energy Regen","energy_regen"]];
+  for(const c of D.characters){
+    const id=String(c.id),stats=CS.map(([l,k])=>`${l.replace("Base ","")} ${n(c[k]??0)}${/CRIT/.test(l)?"%":""}`).join(" \u00b7 ");
+    if(!SITE.chars[id]){rows.push({kind:"Character",id,name:c.name,what:"Not on the site",detail:stats});continue}
+    const b=SITE.base[id];
+    if(!b){rows.push({kind:"Character",id,name:SITE.chars[id],what:"No base stats on the site",detail:stats});continue}
+    for(const [l,k] of CS){
+      if(!(l in b))continue;           // e.g. Sharpness / Adrenaline characters have no Energy Regen row
+      const sv=num(b[l]),ev=c[k];
+      if(ev==null||sv==null)continue;
+      if(CONFIRMED[id+"/"+l]===sv)continue; // the site's number was confirmed in game
+      if(Math.abs(sv-ev)>0.001)rows.push({kind:"Character",id,name:SITE.chars[id],what:l,detail:`exe ${n(ev)} \u00b7 site ${b[l]}`});
+    }
+  }
+  for(const w of D.wengines){
+    const id=String(w.id),stats=`${w.base_stat} ${n(w.base)} \u00b7 ${w.adv_stat} ${n(w.adv)}${w.adv_pct?"%":""}`;
+    if(w.rank==="B")continue;          // the site leaves out B-rank W-Engines on purpose
+    if(!SITE.wengs[id]){rows.push({kind:"W-Engine",id,name:w.name,what:"Not on the site",detail:`${w.rank}-rank \u00b7 ${stats}`});continue}
+    const wi=SITE.winfo[id];if(!wi)continue;
+    const sb=num(wi[0]&&wi[0][1]),sa=num(wi[1]&&wi[1][1]);
+    if(sb!=null&&Math.abs(sb-w.base)>0.001)rows.push({kind:"W-Engine",id,name:SITE.wengs[id],what:wi[0][0],detail:`exe ${n(w.base)} \u00b7 site ${wi[0][1]}`});
+    if(sa!=null&&Math.abs(sa-w.adv)>0.001)rows.push({kind:"W-Engine",id,name:SITE.wengs[id],what:wi[1][0],detail:`exe ${n(w.adv)}${w.adv_pct?"%":""} \u00b7 site ${wi[1][1]}`});
+  }
+  return rows;
+}
+function syncRender(){
+  const rows=syncRows();
+  if(!rows){$("dSync").innerHTML="";$("sCount").textContent="";return}
+  const miss=rows.filter(r=>r.what==="Not on the site").length;
+  $("sCount").textContent=rows.length?`${miss} not on the site \u00b7 ${rows.length-miss} to check`:"";
+  $("dSync").innerHTML=rows.length?`<table class="at-table"><thead><tr><th></th><th>Name</th><th>What</th><th>Details</th></tr></thead><tbody>`+
+    rows.map(r=>`<tr><td class="pic">${r.id?pic(r.id):""}</td><td>${esc(r.name)} <span class="at-muted">(${r.kind}${r.id?" "+r.id:""})</span></td><td>${r.what==="Not on the site"?'<span class="at-sev error">not on the site</span>':esc(r.what)}</td><td>${esc(r.detail)}</td></tr>`).join("")+`</tbody></table>`:'<div class="at-empty">The site has everything in your remielle.exe, with the same numbers.</div>';
+}
+async function dataLoad(){
+  if(D&&D.characters.length){dataRender();return}
+  msg($("dMsg"),"Reading remielle.exe\u2026",true);
+  D=await api("/data");
+  if(!D.exe)msg($("dMsg"),"Pick remielle.exe in the Game save tab first.",false);
+  else if(D.error_message)msg($("dMsg"),D.error_message,false);
+  else msg($("dMsg"),"Read from "+D.exe,true);
+  dataRender();
+}
+$("dFind").addEventListener("input",dataRender);
+ckRender(null);
+// at start: the game state (Check file is locked until remielle.exe is picked)
+gameRefresh().catch(()=>{});
+// Graphics: is the window drawn by the graphics card (smooth pictures, like your browser)
+// or in software (harsher)? Read from WebGL, which only works on the graphics card here.
+(()=>{let t="software drawing (no graphics card) \u2014 pictures look harsher than in your browser";
+  try{const g=document.createElement("canvas").getContext("webgl");
+    if(g){const x=g.getExtension("WEBGL_debug_renderer_info");t="graphics card \u2014 "+(x?g.getParameter(x.UNMASKED_RENDERER_WEBGL):g.getParameter(g.RENDERER))}}catch(e){}
+  $("gfx").textContent="Drawing: "+t;})();
+</script>
+</body>
+</html>

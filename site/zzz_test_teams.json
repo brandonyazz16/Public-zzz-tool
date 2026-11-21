@@ -1,0 +1,341 @@
+{
+  "type": "zzz_saved_builds",
+  "version": 1,
+  "saves": [
+    {
+      "id": "t1a",
+      "name": "TEST T1 Banyue",
+      "ts": 1,
+      "char": {
+        "id": "1471",
+        "mind": "0"
+      },
+      "weng": {
+        "id": "",
+        "level": "60",
+        "rarity": "",
+        "ref": "1"
+      },
+      "discSet": []
+    },
+    {
+      "id": "t1b",
+      "name": "TEST T1 Yuzuha",
+      "ts": 1,
+      "char": {
+        "id": "1411",
+        "mind": "0"
+      },
+      "weng": {
+        "id": "",
+        "level": "60",
+        "rarity": "",
+        "ref": "1"
+      },
+      "discSet": []
+    },
+    {
+      "id": "t1c",
+      "name": "TEST T1 Dialyn (4pc Crimson Wing)",
+      "ts": 1,
+      "char": {
+        "id": "1481",
+        "mind": "0"
+      },
+      "weng": {
+        "id": "",
+        "level": "60",
+        "rarity": "",
+        "ref": "1"
+      },
+      "discSet": [
+        {
+          "id": "344",
+          "rarity": "4",
+          "slot": "1",
+          "level": "15",
+          "mainStat": "11103",
+          "mainVal": "550",
+          "mainExtra": "0",
+          "subs": [
+            {
+              "id": "13103",
+              "rolls": "1"
+            },
+            {
+              "id": "23203",
+              "rolls": "1"
+            },
+            {
+              "id": "31203",
+              "rolls": "1"
+            },
+            {
+              "id": "13102",
+              "rolls": "1"
+            }
+          ]
+        },
+        {
+          "id": "344",
+          "rarity": "4",
+          "slot": "2",
+          "level": "15",
+          "mainStat": "12103",
+          "mainVal": "79",
+          "mainExtra": "0",
+          "subs": [
+            {
+              "id": "13103",
+              "rolls": "1"
+            },
+            {
+              "id": "11103",
+              "rolls": "1"
+            },
+            {
+              "id": "23203",
+              "rolls": "1"
+            },
+            {
+              "id": "31203",
+              "rolls": "1"
+            }
+          ]
+        },
+        {
+          "id": "344",
+          "rarity": "4",
+          "slot": "3",
+          "level": "15",
+          "mainStat": "13103",
+          "mainVal": "46",
+          "mainExtra": "0",
+          "subs": [
+            {
+              "id": "11103",
+              "rolls": "1"
+            },
+            {
+              "id": "23203",
+              "rolls": "1"
+            },
+            {
+              "id": "31203",
+              "rolls": "1"
+            },
+            {
+              "id": "11102",
+              "rolls": "1"
+            }
+          ]
+        },
+        {
+          "id": "344",
+          "rarity": "4",
+          "slot": "4",
+          "level": "15",
+          "mainStat": "20103",
+          "mainVal": "600",
+          "mainExtra": "0",
+          "subs": [
+            {
+              "id": "13103",
+              "rolls": "1"
+            },
+            {
+              "id": "11103",
+              "rolls": "1"
+            },
+            {
+              "id": "23203",
+              "rolls": "1"
+            },
+            {
+              "id": "31203",
+              "rolls": "1"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "t2a",
+      "name": "TEST T2 Dialyn",
+      "ts": 1,
+      "char": {
+        "id": "1481",
+        "mind": "0"
+      },
+      "weng": {
+        "id": "",
+        "level": "60",
+        "rarity": "",
+        "ref": "1"
+      },
+      "discSet": []
+    },
+    {
+      "id": "t2b",
+      "name": "TEST T2 Lucia (Dreamlit W3)",
+      "ts": 1,
+      "char": {
+        "id": "1451",
+        "mind": "0"
+      },
+      "weng": {
+        "id": "14145",
+        "level": "60",
+        "rarity": "4",
+        "ref": "3"
+      },
+      "discSet": []
+    },
+    {
+      "id": "t2c",
+      "name": "TEST T2 Astra",
+      "ts": 1,
+      "char": {
+        "id": "1311",
+        "mind": "0"
+      },
+      "weng": {
+        "id": "",
+        "level": "60",
+        "rarity": "",
+        "ref": "1"
+      },
+      "discSet": []
+    },
+    {
+      "id": "t3a",
+      "name": "TEST T3 Remielle",
+      "ts": 1,
+      "char": {
+        "id": "1581",
+        "mind": "0"
+      },
+      "weng": {
+        "id": "",
+        "level": "60",
+        "rarity": "",
+        "ref": "1"
+      },
+      "discSet": []
+    },
+    {
+      "id": "t3b",
+      "name": "TEST T3 Velina",
+      "ts": 1,
+      "char": {
+        "id": "1561",
+        "mind": "0"
+      },
+      "weng": {
+        "id": "",
+        "level": "60",
+        "rarity": "",
+        "ref": "1"
+      },
+      "discSet": []
+    },
+    {
+      "id": "t3c",
+      "name": "TEST T3 Sunna",
+      "ts": 1,
+      "char": {
+        "id": "1491",
+        "mind": "0"
+      },
+      "weng": {
+        "id": "",
+        "level": "60",
+        "rarity": "",
+        "ref": "1"
+      },
+      "discSet": []
+    },
+    {
+      "id": "t4a",
+      "name": "TEST T4 Seed",
+      "ts": 1,
+      "char": {
+        "id": "1461",
+        "mind": "0"
+      },
+      "weng": {
+        "id": "",
+        "level": "60",
+        "rarity": "",
+        "ref": "1"
+      },
+      "discSet": []
+    },
+    {
+      "id": "t4b",
+      "name": "TEST T4 Soldier 0",
+      "ts": 1,
+      "char": {
+        "id": "1381",
+        "mind": "0"
+      },
+      "weng": {
+        "id": "",
+        "level": "60",
+        "rarity": "",
+        "ref": "1"
+      },
+      "discSet": []
+    },
+    {
+      "id": "t4c",
+      "name": "TEST T4 Lucia (no W-Engine)",
+      "ts": 1,
+      "char": {
+        "id": "1451",
+        "mind": "0"
+      },
+      "weng": {
+        "id": "",
+        "level": "60",
+        "rarity": "",
+        "ref": "1"
+      },
+      "discSet": []
+    }
+  ],
+  "teams": [
+    {
+      "name": "TEST 1 \u00b7 Banyue + Yuzuha + Dialyn",
+      "members": [
+        "t1a",
+        "t1b",
+        "t1c"
+      ]
+    },
+    {
+      "name": "TEST 2 \u00b7 Dialyn + Lucia + Astra",
+      "members": [
+        "t2a",
+        "t2b",
+        "t2c"
+      ]
+    },
+    {
+      "name": "TEST 3 \u00b7 Remielle + Velina + Sunna",
+      "members": [
+        "t3a",
+        "t3b",
+        "t3c"
+      ]
+    },
+    {
+      "name": "TEST 4 \u00b7 Seed + Soldier 0 + Lucia",
+      "members": [
+        "t4a",
+        "t4b",
+        "t4c"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+zig-out/
+.zig-cache/
+testdata/
+*.ini
+zzz-zon-tool-zoom.txt
+zzz-zon-tool-crash.txt
+third_party/cef/
+zzz-zon-tool-data/
