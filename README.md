@@ -68,7 +68,7 @@ makes `zig-out/Public-zzz-tool-windows.zip` (about 180 MB): unzip it anywhere an
   - a file with any Check file error is never packed, and packing needs a second click;
   - the new save is packed to a separate file and read back with `print-player` before it's
     used - if Remielle refuses either step, nothing in the game folder changes;
-  - the old save is copied to `zzz-zon-tool/backups/` first, then replaced atomically;
+  - the old save is copied to `Public-zzz-tool/backups/` first, then replaced atomically;
   - **Restore** puts any backup back (and backs up the save it replaces); backups are never deleted.
   After packing, log out and back in to the game to see the change (the server can stay open).
   Every pack reads the new save back and compares it, character by character, with what was
