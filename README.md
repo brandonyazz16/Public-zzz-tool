@@ -13,7 +13,7 @@ exactly like the site.
 - **Nothing leaves your PC.** The page loads from local files; Chrome's background services,
   component updates and crash reports are off; all web traffic is pointed at a closed local
   port (`--proxy-server=http://127.0.0.1:9`), so nothing can go online even by accident.
-- **Your saved builds** (the site's localStorage) live in `Public-zzz-tool-data/` next to the app.
+- **Your saved builds** (the site's localStorage) live in `zzz-zon-tool-data/` next to the app.
 - **Zoom** like a browser: Ctrl +, Ctrl -, Ctrl 0 or Ctrl + mouse wheel (starts at 110%, remembered).
 - The window remembers its size and position (and whether it was maximized).
 - Web links (the guides' links, YouTube, ...) open in your own browser; the app window itself
@@ -39,7 +39,7 @@ cd Public-zzz-tool
 zig build run
 ```
 
-`zig-out/bin/` is a complete app folder (`Public-zzz-tool.exe`, CEF's files, `site/`, `app_pages/`).
+`zig-out/bin/` is a complete app folder (`zzz-zon-tool.exe`, CEF's files, `site/`, `app_pages/`).
 Update later with `git pull` and `zig build run` again.
 
 ### Ready-to-run zip
@@ -48,8 +48,8 @@ Update later with `git pull` and `zig build run` again.
 zig build release
 ```
 
-makes `zig-out/Public-zzz-tool-windows.zip` (about 180 MB): unzip it anywhere and run
-`Public-zzz-tool.exe` - no Zig needed on that PC.
+makes `zig-out/zzz-zon-tool-windows.zip` (about 180 MB): unzip it anywhere and run
+`zzz-zon-tool.exe` - no Zig needed on that PC.
 
 ## App tools
 
@@ -68,7 +68,7 @@ makes `zig-out/Public-zzz-tool-windows.zip` (about 180 MB): unzip it anywhere an
   - a file with any Check file error is never packed, and packing needs a second click;
   - the new save is packed to a separate file and read back with `print-player` before it's
     used - if Remielle refuses either step, nothing in the game folder changes;
-  - the old save is copied to `Public-zzz-tool/backups/` first, then replaced atomically;
+  - the old save is copied to `zzz-zon-tool/backups/` first, then replaced atomically;
   - **Restore** puts any backup back (and backs up the save it replaces); backups are never deleted.
   After packing, log out and back in to the game to see the change (the server can stay open).
   Every pack reads the new save back and compares it, character by character, with what was

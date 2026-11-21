@@ -1,0 +1,7 @@
+.{
+    .name = .zzz_zon_tool,
+    .version = "0.0.1",
+    .minimum_zig_version = "0.17.0",
+    .paths = .{""},
+    .fingerprint = 0x2cc158d2d743eaa8,
+}
