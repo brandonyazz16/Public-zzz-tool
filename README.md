@@ -13,7 +13,7 @@ exactly like the site.
 - **Nothing leaves your PC.** The page loads from local files; Chrome's background services,
   component updates and crash reports are off; all web traffic is pointed at a closed local
   port (`--proxy-server=http://127.0.0.1:9`), so nothing can go online even by accident.
-- **Your saved builds** (the site's localStorage) live in `zzz-zon-tool-data/` next to the app.
+- **Your saved builds** (the site's localStorage) live in `Public-zzz-tool-data/` next to the app.
 - **Zoom** like a browser: Ctrl +, Ctrl -, Ctrl 0 or Ctrl + mouse wheel (starts at 110%, remembered).
 - The window remembers its size and position (and whether it was maximized).
 - Web links (the guides' links, YouTube, ...) open in your own browser; the app window itself
