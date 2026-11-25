@@ -104,6 +104,7 @@ main{max-width:min(1400px,calc(100vw - 32px))}
         <div class="at-row">
           <button type="button" id="gCliPick">Pick remielle-bootstrap&hellip;</button>
           <button type="button" class="primary" id="gCliStart">Start game</button>
+          <button type="button" id="gCliRestart" title="Closes the game (everything running from its folder - never the server) and starts remielle-bootstrap again. One Windows prompt.">Restart game</button>
           <button type="button" class="primary" id="gBoth" title="Starts the server, then the game">Start server + game</button>
         </div>
       </div>
@@ -232,7 +233,7 @@ function gameRender(s){
   $("gSrv").style.color=s.server?"#5fd38a":"";
   $("gSrvStart").disabled=!s.exe||s.server;$("gSrvStop").disabled=!s.server;
   $("gCli").textContent=s.client||"not picked yet";
-  $("gCliStart").disabled=!s.client;$("gBoth").disabled=!s.client||!s.exe||s.server;
+  $("gCliStart").disabled=!s.client;$("gCliRestart").disabled=!s.client;$("gBoth").disabled=!s.client||!s.exe||s.server;
   $("gFile").textContent=!s.file_open?"To pack: open or read a file in Check file first.":s.file_errors?`Check file shows ${s.file_errors} error${s.file_errors===1?"":"s"} — fix ${s.file_errors===1?"it":"them"} first; a file with errors is never packed.`:`Will pack: ${s.file_name}`;
   $("gFile").className="at-msg"+(s.file_open&&s.file_errors?" bad":"");
   if(s.message)msg($("gMsg"),s.message,s.ok);
@@ -247,6 +248,7 @@ $("gSrvStart").onclick=async()=>gameRender(await api("/game/server-start",{}));
 $("gCheck").onclick=async()=>{$("gCheck").disabled=true;gameRender(await api("/game/check-save",{}));$("gCheck").disabled=false};
 $("cLockPick").onclick=async()=>gameRender(await api("/game/pick-exe",{}));
 $("gCliPick").onclick=async()=>gameRender(await api("/game/pick-client",{}));
+$("gCliRestart").onclick=async()=>{$("gCliRestart").disabled=true;gameRender(await api("/game/client-restart",{}))};
 $("gCliStart").onclick=async()=>gameRender(await api("/game/client-start",{}));
 $("gBoth").onclick=async()=>{const s=await api("/game/server-start",{});gameRender(s);if(!s.ok)return;
   setTimeout(async()=>gameRender(await api("/game/client-start",{})),2000)}; // give the server a moment first

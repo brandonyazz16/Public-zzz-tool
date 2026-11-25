@@ -21,6 +21,8 @@ extern fn plat_server_running() c_int;
 extern fn plat_server_stop() c_int;
 /// Starts a program in its own window, from its own folder (the game's launcher)
 extern fn plat_launch(exe: [*:0]const u8, dir: [*:0]const u8) c_int;
+/// closes the game (everything running from its folder, never the server) and starts it again
+extern fn plat_game_restart(exe: [*:0]const u8, dir: [*:0]const u8) c_int;
 
 var gpa: std.mem.Allocator = undefined;
 var io: std.Io = undefined;
@@ -116,7 +118,7 @@ pub export fn zapi_free(p: ?[*]u8, len: usize) void {
 /// File pickers must run on the window's thread.
 export fn zapi_needs_ui_thread(path_ptr: [*]const u8, path_len: usize) c_int {
     const p = path_ptr[0..path_len];
-    return @intFromBool(std.mem.startsWith(u8, p, "/api/game/pick-") or std.mem.startsWith(u8, p, "/api/game/server-start") or std.mem.startsWith(u8, p, "/api/game/client-start") or std.mem.startsWith(u8, p, "/api/zoom"));
+    return @intFromBool(std.mem.startsWith(u8, p, "/api/game/pick-") or std.mem.startsWith(u8, p, "/api/game/server-start") or std.mem.startsWith(u8, p, "/api/game/client-start") or std.mem.startsWith(u8, p, "/api/game/client-restart") or std.mem.startsWith(u8, p, "/api/zoom"));
 }
 
 const Response = struct { status: c_int = 200, mime: [*:0]const u8 = "application/json", data: []u8 };
@@ -406,6 +408,15 @@ fn gameApi(path: []const u8, body: []const u8) !Response {
         std.Io.Dir.cwd().writeFile(io, .{ .sub_path = keep, .data = picked }) catch |e|
             return gameState(a, try std.fmt.allocPrint(a, "Couldn't remember it ({s}).", .{@errorName(e)}), false);
         return gameState(a, "", true);
+    }
+    if (std.mem.eql(u8, path, "/client-restart")) {
+        const c = clientPath(a);
+        if (c.len == 0) return gameState(a, "Pick remielle-bootstrap first.", false);
+        const exe = try a.dupeSentinel(u8, c, 0);
+        const dir = try a.dupeSentinel(u8, std.fs.path.dirname(c) orelse ".", 0);
+        const rc = plat_game_restart(exe.ptr, dir.ptr);
+        if (rc != 0) return gameState(a, try std.fmt.allocPrint(a, "Couldn't restart the game ({s}, Windows error {d}).", .{ winErr(rc), rc }), false);
+        return gameState(a, "Game restarting: closed it, starting remielle-bootstrap again.", true);
     }
     if (std.mem.eql(u8, path, "/client-start")) {
         const c = clientPath(a);

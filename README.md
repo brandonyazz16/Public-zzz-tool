@@ -79,6 +79,8 @@ makes `zig-out/zzz-zon-tool-windows.zip` (about 180 MB): unzip it anywhere and r
   down cleanly (if it's still running 10 s later it's ended).
 - **Game (beta)**: pick remielle-bootstrap in your CNBetaWin client folder once, then
   **Start game**, or **Start server + game**. It needs admin rights, so Windows asks first.
+  **Restart game** closes the game (every program running from the CNBetaWin folder - never the
+  server) and starts remielle-bootstrap again, with one Windows prompt.
 - **Game save <-> .zon editor**: **Read into .zon editor** opens a player's save in the site's
   .zon editor (asks for a second click if the editor already has a loaded or edited file).
   Equip builds there as usual, then **Pack into game** (next to Download .zon, only in the app)

@@ -8,6 +8,7 @@
 #define CEF_API_VERSION 15600
 #include <windows.h>
 #include <shellapi.h>
+#include <tlhelp32.h>
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
@@ -792,4 +793,56 @@ int plat_server_stop(void) {
 // The game's launcher (remielle.exe in the CNBetaWin folder): its own window, its own folder.
 int plat_launch(const char* exe, const char* dir) {
     return start_program(exe, dir, NULL, NULL);
+}
+
+// Restart game: the game runs as administrator (remielle-bootstrap needs it), and Windows won't
+// let this app close an administrator program. So one elevated command does both - one Windows
+// prompt: close every program running from the game's folder (never the server), then start
+// remielle-bootstrap again. Returns 0, 1223 when No was clicked on the prompt, or a Windows error.
+int plat_game_restart(const char* exe, const char* dir) {
+    wchar_t wexe[2048], wdir[2048];
+    if (utf8_to_w(exe, wexe, 2048) <= 0 || utf8_to_w(dir, wdir, 2048) <= 0) return (int)ERROR_INVALID_PARAMETER;
+    size_t dlen = wcslen(wdir);
+    while (dlen > 0 && (wdir[dlen - 1] == L'\\' || wdir[dlen - 1] == L'/')) wdir[--dlen] = 0;
+
+    // the programs running from the game folder
+    static wchar_t params[8192];
+    int n = _snwprintf(params, 8000, L"/c taskkill /F /T");
+    int found = 0;
+    HANDLE snap = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0);
+    if (snap != INVALID_HANDLE_VALUE) {
+        PROCESSENTRY32W pe;
+        memset(&pe, 0, sizeof pe);
+        pe.dwSize = sizeof pe;
+        DWORD me = GetCurrentProcessId();
+        for (BOOL ok = Process32FirstW(snap, &pe); ok; ok = Process32NextW(snap, &pe)) {
+            if (pe.th32ProcessID == me || pe.th32ProcessID == 0 || (g_srv_pid && pe.th32ProcessID == g_srv_pid)) continue;
+            HANDLE h = OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, FALSE, pe.th32ProcessID);
+            if (!h) continue;
+            wchar_t path[2048];
+            DWORD plen = 2048;
+            if (QueryFullProcessImageNameW(h, 0, path, &plen) && plen > dlen && _wcsnicmp(path, wdir, dlen) == 0 && (path[dlen] == L'\\' || path[dlen] == L'/')) {
+                if (n < 7900) n += _snwprintf(params + n, 8000 - n, L" /PID %lu", (unsigned long)pe.th32ProcessID);
+                found++;
+            }
+            CloseHandle(h);
+        }
+        CloseHandle(snap);
+    }
+    // nothing running: just start it (a normal start, its own prompt as usual)
+    if (found == 0) return plat_launch(exe, dir);
+    // close them, wait a moment, start remielle-bootstrap from its folder (already elevated: no second prompt)
+    _snwprintf(params + n, 8190 - n, L" & timeout /t 2 /nobreak >nul & start \"\" /D \"%s\" \"%s\"", wdir, wexe);
+    params[8191] = 0;
+    SHELLEXECUTEINFOW se;
+    memset(&se, 0, sizeof se);
+    se.cbSize = sizeof se;
+    se.fMask = SEE_MASK_NOASYNC;
+    se.lpVerb = L"runas";
+    se.lpFile = L"cmd.exe";
+    se.lpParameters = params;
+    se.lpDirectory = wdir;
+    se.nShow = SW_HIDE;
+    if (!ShellExecuteExW(&se)) return (int)GetLastError();
+    return 0;
 }

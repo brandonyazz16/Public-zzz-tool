@@ -22,6 +22,11 @@ export fn plat_launch(exe: [*:0]const u8, dir: [*:0]const u8) c_int {
     _ = dir;
     return 0;
 }
+export fn plat_game_restart(exe: [*:0]const u8, dir: [*:0]const u8) c_int {
+    _ = exe;
+    _ = dir;
+    return 0;
+}
 export fn plat_open_file(filter: [*:0]const u16, out: [*]u8, out_len: c_int) c_int {
     _ = filter;
     _ = out;

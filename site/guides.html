@@ -638,7 +638,7 @@ body:not(.dev) .cb-add,body:not(.dev) li:has(> .cb-add){display:none}
 <script>document.body.classList.add("pg-"+(document.documentElement.dataset.page||"main"))</script>
 <main>
   <div class="warnbar" role="alert">⚠️ FOR WINDOWS ONLY ⚠️</div>
-  <h1>Create-Equip Command Builder <a href="log.html" class="ver-tag">v7.2.1</a> <a href="remielle.html" class="ver-tag cmd-link" title="Copy zig build ctl commands for Remielle">Remielle commands</a> <span class="game-tag" title="Game version this site's data is for">Game 3.4.3 beta</span></h1>
+  <h1>Create-Equip Command Builder <a href="log.html" class="ver-tag">v7.2.7</a> <a href="remielle.html" class="ver-tag cmd-link" title="Copy zig build ctl commands for Remielle">Remielle commands</a> <span class="game-tag" title="Game version this site's data is for">Game 3.4.3 beta</span></h1>
   <p class="sub">Choose a section, pick values from the dropdowns and copy the command.</p>
 
   <nav class="pnav">
@@ -2239,7 +2239,7 @@ const ZON_CHAR={"1011": "Anby", "1021": "Nekomata", "1031": "Nicole", "1041": "S
 const ZON_WENG={"14163":"Incarcerating Grip","14164":"Plume of Rebirth","14165":"Requiem Araneae","14166":"Iridescent Starsong"};
 const ZON_KEY={HP:"HP",Atk:"ATK",Def:"DEF","HP%":"Percent HP","Atk%":"Percent ATK","Def%":"Percent DEF",CR:"CRIT Rate",CDMG:"CRIT DMG",AP:"Anomaly Proficiency",AM:"Anomaly Mastery","Pen%":"PEN Ratio",Pen:"PEN",ER:"Energy Regen",Impact:"Impact",Fire:"Fire DMG Bonus",Ice:"Ice DMG Bonus",Electric:"Electric DMG Bonus",Ether:"Ether DMG Bonus",Physical:"Physical DMG Bonus",Wind:"Wind DMG Bonus"};
 /* disc slots whose server name has NO space before [slot], e.g. "Bloodwing Nocturne [2]" (from the game's own data) */
-const ZON_NOSPACE={"Bloodwing Nocturne":[2,6],"Monument of the Star":[1,2,6]};
+const ZON_NOSPACE={};
 function zonDiscName(sn,slot){
   /* the loaded file wins: if it only has one spelling for this slot, use that one */
   if(ZON_FILE){const a=ZON_FILE.includes(`"${sn} [${slot}]"`),b=ZON_FILE.includes(`"${sn}[${slot}]"`);if(a!==b)return b?`${sn}[${slot}]`:`${sn} [${slot}]`}
@@ -3060,6 +3060,9 @@ const SET4_STAT=[
   {set:"329",k:"cr",v:12,mode:"trig",label:"Shadow Harmony \u00b7 4pc \u00b7 \u00d73"},
   {set:"331",k:"cr",v:12,mode:"trig",label:"Yunkui Tales \u00b7 4pc \u00b7 \u00d73"},
   {set:"335",k:"cr",v:10,mode:"trig",label:"White Water Ballad \u00b7 4pc \u00b7 Ether Veil"},
+  {set:"335",k:"cr",v:10,mode:"trig",spec:"Attack",label:"White Water Ballad \u00b7 4pc \u00b7 Attack character: Ether Veil activated or extended (30s)"},
+  {set:"335",k:"atkPct",v:10,mode:"trig",spec:"Attack",label:"White Water Ballad \u00b7 4pc \u00b7 Attack character: Ether Veil activated or extended (30s)"},
+  {set:"332",k:"cdmg",v:15,mode:"trig",spec:"Stun",label:"King of the Summit \u00b7 4pc \u00b7 Stun character: EX Special Attack or Chain Attack (15s, squad)"},
   {set:"327",k:"cr",v:12,mode:"trig",label:"Branch & Blade Song \u00b7 4pc \u00b7 Freeze/Shatter"},
   {set:"340",k:"atkPct",v:10,mode:"trig",label:"The Sky Ablaze \u00b7 4pc \u00b7 EX/Ultimate"},
   {set:"330",k:"ap",v:45,mode:"trig",label:"Phaethon's Melody \u00b7 4pc \u00b7 squad EX"},
@@ -3091,15 +3094,54 @@ function squadChipsHtml(charId,n){if(!SQUAD_CHARS.has(charId))return "";return `
 /* Character kit buffs that only apply in gameplay (grayed: in the "with" value, not the menu number). */
 /* Additional Ability squad restrictions, word for word (unsure = the owner marked it with *) */
 const ADD_REQ={"1311": {"text": "When another character in your squad is an Attack, Anomaly, or Rupture character:", "spec": ["Attack", "Anomaly", "Rupture"]}, "1471": {"text": "When another character in your squad is a Support or Stun character:", "spec": ["Support", "Stun"]}, "1611": {"text": "When another character in your squad is a Stun or Armorer character, or shares the same attribute:", "spec": ["Stun", "Armorer"], "attr": 1}, "1481": {"text": "When another character in your squad is an Attack or Rupture character", "spec": ["Attack", "Rupture"]}, "1191": {"text": "When another character in your squad is a Stun character or shares the same Attribute or Faction:", "spec": ["Stun"], "attr": 1, "faction": 1}, "1091": {"text": "When another character in your squad is a Support or Anomaly character, or shares the same Faction:", "spec": ["Support", "Anomaly"], "faction": 1}, "1651": {"text": "When another character in your squad is a Support Character or Anomaly Character:", "spec": ["Support", "Anomaly"], "unsure": 1}, "1451": {"text": "When another character in your squad is a Rupture or Stun character:", "spec": ["Rupture", "Stun"]}, "1511": {"text": "When another character in your squad is an Anomaly character or shares the same Faction:", "spec": ["Anomaly"], "faction": 1}, "1571": {"text": "When another character in your squad is an Attack or Rupture character, or shares the same Faction:", "spec": ["Attack", "Rupture"], "faction": 1}, "1541": {"text": "When another character in your squad is an Anomaly or Support character:", "spec": ["Anomaly", "Support"]}, "1581": {"text": "Only active with Anomaly characters (1/2/3, Remielle included); no other specialty activates it", "count": "Anomaly"}, "1621": {"text": "When another character in your squad is an Attack, Rupture, or Armorer character:", "spec": ["Attack", "Rupture", "Armorer"]}, "1461": {"text": "When another Attack Character is in your squad:", "spec": ["Attack"]}, "1631": {"text": "When another character in your squad is a Support or Stun character, or shares the same faction:", "spec": ["Support", "Stun"], "faction": 1}, "1591": {"text": "When another character in your squad is a Support or Stun character:", "spec": ["Support", "Stun"]}, "1381": {"text": "When another character in your squad is a Stun or Support character:", "spec": ["Stun", "Support"]}, "1041": {"text": "When another character in your squad shares the same Attribute or Faction:", "spec": [], "attr": 1, "faction": 1}, "1531": {"text": "When another character in your squad is a Stun, Defense, or Support character:", "spec": ["Stun", "Defense", "Support"]}, "1601": {"text": "When another character in your squad is a Stun character, Defense character, or another Armorer character:", "spec": ["Stun", "Defense", "Armorer"], "unsure": 1}, "1491": {"text": "When another character in your squad is an Attack character or shares the same Faction:", "spec": ["Attack"], "faction": 1}, "1411": {"text": "When another character in your squad is an Anomaly character or shares the same Faction:", "spec": ["Anomaly"], "faction": 1}, "1561": {"text": "When another character in your squad is an Anomaly character or shares the same attribute:", "spec": ["Anomaly"], "attr": 1}, "1331": {"text": "When another character in your squad is an Anomaly character or shares the same attribute:", "spec": ["Anomaly"], "attr": 1}, "1051": {"text": "When another character in your squad is a Stun or Support character:", "spec": ["Stun", "Support"]}, "1241": {"text": "When another character in your squad is a Support character or shares the same Faction:", "spec": ["Support"], "faction": 1}, "1061": {"text": "When another character in your squad shares the same Attribute or Faction:", "spec": [], "attr": 1, "faction": 1}, "1421": {"text": "When another character in your squad is a Rupture character or shares the same Faction:", "spec": ["Rupture"], "faction": 1}};
-const CHAR_PASS={"1591":[{k:"atkFlat",v:840,label:"Additional Ability \u00b7 120 + 12 per level (Lv 60 = max 840)"},{k:"cr",v:66,label:"Core Passive \u00b7 Aerial Patrol Spear (8s)"}],"1561":[{k:"windsweptDmg",v:10,label:"Additional Ability (needs an Anomaly teammate or one with the same attribute)"},{k:"vortexDmg",v:10,label:"Additional Ability (needs an Anomaly teammate or one with the same attribute)"}],"1041":[{k:"fireDmg",v:10,label:"Additional Ability (needs a teammate with the same Attribute or Faction)"}],"1481":[{k:"dmgBonus",v:40,label:"Additional Ability \u00b7 Overwhelmingly Positive (needs an Attack or Rupture teammate; all squad members)"}],"1461":[{k:"atkFlat",v:1000,label:"Core Passive \u00b7 Onslaught (Vanguard EX)"},{k:"cdmg",v:30,label:"Core Passive \u00b7 Onslaught (Vanguard EX)"}],"1411":[{k:"dmgBonus",v:15,label:"Core Passive \u00b7 Tanuki Wish (40s)"}],"1451":[{k:"hpPct",v:5,label:"Ether Veil"},{k:"dmgBonus",v:20,label:"Dreamer's Nursery Rhyme (12s)"}],"1601":[{k:"cr",v:40,label:"EX Special Attack \u00b7 self buff"}],"1531":[{k:"cdmg",v:90,label:"EX Special Attack \u00b7 self buff"}],"1651":[{k:"ap",v:84,label:"Core Passive",always:1}],"1191":[{k:"iceDmg",v:30,label:"Ice DMG +3% \u00d710 stacks (10s)"}],"1381":[{k:"cr",v:10,label:"Additional Ability",always:1},{k:"aftershockDmg",v:25,label:"Additional Ability \u00b7 vs Silver Star (while active)"},{k:"dmgBonus",v:25,label:"vs Silver Star"}],"1471":[{k:"sfFlat",v:300,label:"Core Passive \u00b7 EX/Assist Follow-Up"},{k:"cdmg",v:36,label:"Core Passive \u00b7 EX/Assist Follow-Up"},{k:"fireDmg",v:36,label:"Core Passive \u00b7 EX/Assist Follow-Up"},{k:"fireDmg",v:15,label:"Additional Ability \u00b7 Vidyaraja \u00d73 (8s)"}]};
+const CHAR_PASS={"1431":[{k:"cr",v:30,label:"Core Passive \u00b7 Unity: Upon entering the battlefield, gain Unity, increasing CRIT Rate by 30% and DMG by 25%."},{k:"dmgBonus",v:25,label:"Core Passive \u00b7 Unity: Upon entering the battlefield, gain Unity, increasing CRIT Rate by 30% and DMG by 25%."}],"1591":[{k:"atkFlat",v:840,label:"Additional Ability \u00b7 120 + 12 per level (Lv 60 = max 840)"},{k:"cr",v:66,label:"Core Passive \u00b7 Aerial Patrol Spear (8s)"}],"1561":[{k:"windsweptDmg",v:10,label:"Additional Ability (needs an Anomaly teammate or one with the same attribute)"},{k:"vortexDmg",v:10,label:"Additional Ability (needs an Anomaly teammate or one with the same attribute)"}],"1041":[{k:"fireDmg",v:10,label:"Additional Ability (needs a teammate with the same Attribute or Faction)"}],"1481":[{k:"dmgBonus",v:40,label:"Additional Ability \u00b7 Overwhelmingly Positive (needs an Attack or Rupture teammate; all squad members)"}],"1461":[{k:"atkFlat",v:1000,label:"Core Passive \u00b7 Onslaught (Vanguard EX)"},{k:"cdmg",v:30,label:"Core Passive \u00b7 Onslaught (Vanguard EX)"}],"1411":[{k:"dmgBonus",v:15,label:"Core Passive \u00b7 Tanuki Wish (40s)"}],"1451":[{k:"hpPct",v:5,label:"Ether Veil"},{k:"dmgBonus",v:20,label:"Dreamer's Nursery Rhyme (12s)"}],"1601":[{k:"cr",v:40,label:"EX Special Attack \u00b7 self buff"}],"1531":[{k:"cdmg",v:90,label:"EX Special Attack \u00b7 self buff"}],"1651":[{k:"ap",v:84,label:"Core Passive",always:1}],"1191":[{k:"iceDmg",v:30,label:"Ice DMG +3% \u00d710 stacks (10s)"}],"1381":[{k:"cr",v:10,label:"Additional Ability",always:1},{k:"aftershockDmg",v:25,label:"Additional Ability \u00b7 vs Silver Star (while active)"},{k:"dmgBonus",v:25,label:"vs Silver Star"}],"1471":[{k:"sfFlat",v:300,label:"Core Passive \u00b7 EX/Assist Follow-Up"},{k:"cdmg",v:36,label:"Core Passive \u00b7 EX/Assist Follow-Up"},{k:"fireDmg",v:36,label:"Core Passive \u00b7 EX/Assist Follow-Up"},{k:"fireDmg",v:15,label:"Additional Ability \u00b7 Vidyaraja \u00d73 (8s)"}]};
 /* Character-specific stat conversions, applied after gear (uses total stats). Claret: +0.35% CRIT Rate per 1% CRIT DMG. */
 const CHAR_CONV={"1631":[{from:"cr",to:"atk",ratio:8.5,over:0,max:850,cond:1,trig:1,floor:1,label:"Additional Ability \u00b7 8.5 ATK per 1% CRIT Rate (cap 100% CR)"}],"1411":[{from:"am",to:"anomalyDmg",ratio:0.2,over:100,max:20,cond:1,label:"AM \u2192 Attribute Anomaly DMG"},{from:"am",to:"disorderDmg",ratio:0.2,over:100,max:20,cond:1,label:"AM \u2192 Disorder DMG"}],"1481":[{from:"cr",to:"impact",ratio:2,over:50,max:100,cond:1,floor:1,label:"CR conv."}],"1651":[{from:"er",to:"am",over:1.2,step:0.12,per:10,max:140,cond:1,trig:1,floor:1,label:"Additional Ability \u00b7 ER \u2192 AM (30s)"}],"1611":[{from:"cdmg",to:"cr",ratio:0.35,label:"CDMG conv."}],"1601":[{from:"cdmg",to:"cr",ratio:0.35,label:"CDMG conv."}],"1571":[{from:"cr",to:"cdmg",ratio:1.7,over:50,max:85,label:"CR conv.",cond:1}],"1541":[{from:"am",to:"ap",ratio:1.5,over:150,label:"AM conv.",cond:1,floor:1}],"1511":[{from:"am",to:"impact",ratio:1,over:110,label:"AM conv.",cond:1,floor:1}],"1561":[{from:"er",to:"am",ratio:50,over:1.2,step:0.01,max:84,label:"ER conv.",cond:1,floor:1}],"1621":[{from:"er",to:"atk",ratio:500,over:1.2,step:0.01,max:960,label:"ER conv.",cond:1,floor:1},{from:"er",to:"impact",ratio:40,over:1.2,step:0.01,max:76.8,label:"ER conv.",cond:1,floor:1}]};
 /* Conditional 4-piece set bonuses that depend on a stat threshold. Not in the solid (menu) stat; shown in the grayed "with" value. */
-const SET4_COND=[{set:"344",when:"cr",min:50,to:"cdmg",add:30,label:"Bloodwing Nocturne \u00b7 4pc (CR\u226550%)"},{set:"327",when:"am",min:115,to:"cdmg",add:30,label:"Branch & Blade Song \u00b7 4pc (AM\u2265115)"},{set:"342",when:"def",min:1000,to:"cr",add:8,label:"Thorned Rose \u00b7 4pc (DEF\u22651,000)"},{set:"342",when:"def",min:1800,to:"cr",add:8,label:"Thorned Rose \u00b7 4pc (DEF\u22651,800)"}];
+const SET4_COND=[{set:"332",spec:"Stun",trig:true,when:"cr",min:50,to:"cdmg",add:15,label:"King of the Summit \u00b7 4pc \u00b7 Stun character: EX Special Attack or Chain Attack, CR\u226550% (15s, squad)"},{set:"344",when:"cr",min:50,to:"cdmg",add:30,label:"Bloodwing Nocturne \u00b7 4pc (CR\u226550%)"},{set:"327",when:"am",min:115,to:"cdmg",add:30,label:"Branch & Blade Song \u00b7 4pc (AM\u2265115)"},{set:"342",when:"def",min:1000,to:"cr",add:8,label:"Thorned Rose \u00b7 4pc (DEF\u22651,000)"},{set:"342",when:"def",min:1800,to:"cr",add:8,label:"Thorned Rose \u00b7 4pc (DEF\u22651,800)"}];
 /* Rupture rule: any character whose panel has Sheer Force gets 0.1 Sheer Force per Max HP + 0.3 per ATK, each part rounded down. */
 const RUPTURE_CONV=[{from:"hp",to:"sf",ratio:0.1,label:"Max HP conv.",floor:1},{from:"atk",to:"sf",ratio:0.3,label:"ATK conv.",floor:1}];
 /* Core Skill bonuses — all calcs assume core level F. Each: stat key, bonus per core level, number of levels that give it. */
 const CHAR_CORE={
+  /* from remielle.exe's Core Skill table (stat bonuses only; extra effects in a Core's text aren't included) */
+  "1011":[{k:"impact",per:6,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1021":[{k:"cr",per:4.8,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1031":[{k:"er",per:0.12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1071":[{k:"impact",per:6,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1081":[{k:"cr",per:4.8,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1101":[{k:"impact",per:6,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1111":[{k:"cr",per:4.8,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1121":[{k:"er",per:0.12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1131":[{k:"er",per:0.12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1141":[{k:"impact",per:6,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1151":[{k:"er",per:0.12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1161":[{k:"impact",per:6,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1171":[{k:"er",per:0.12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1181":[{k:"am",per:12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1201":[{k:"cr",per:4.8,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1221":[{k:"am",per:12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1251":[{k:"impact",per:6,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1261":[{k:"am",per:12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1271":[{k:"er",per:0.12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1281":[{k:"er",per:0.12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1291":[{k:"cr",per:4.8,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1301":[{k:"er",per:0.12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1321":[{k:"cr",per:4.8,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1341":[{k:"hpPct",per:6,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1351":[{k:"impact",per:6,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1361":[{k:"impact",per:6,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1371":[{k:"cr",per:4.8,levels:3,lv:"A\u2013C"},{k:"hp",per:140,levels:3,lv:"D\u2013F"}],
+  "1391":[{k:"cr",per:4.8,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1401":[{k:"am",per:12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1421":[{k:"er",per:0.12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1441":[{k:"hpPct",per:6,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1501":[{k:"am",per:12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1521":[{k:"er",per:0.12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1551":[{k:"cr",per:4.8,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1641":[{k:"am",per:12,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1651":[{k:"ap",per:18,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1661":[{k:"hpPct",per:6,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
+  "1431":[{k:"cr",per:4.8,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
   "1211":[{k:"penr",per:4.8,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
   "1611":[{k:"cr",per:4.8,levels:6,lv:"A\u2013F"}],
   "1381":[{k:"cr",per:4.8,levels:3,lv:"A\u2013C"},{k:"atk",per:25,levels:3,lv:"D\u2013F"}],
@@ -3162,7 +3204,7 @@ function computeBuildStats(charId,wId,wRef,discSet,mind,opts){
     (d.subs||[]).forEach(sb=>{if(!sb||!sb.id)return;const sub=find(SUBS,sb.id);if(!sub)return;const n=+sb.rolls||1,raw=(+sub[2])*n;put(DISC_KEY[sub[1]],PCT.has(sub[1])?raw/100:raw,`${dn} — sub-stat x${n}`,"sub",`S${d.slot}×${n}`)});
   });
   Object.keys(counts).forEach(id=>{if(counts[id]<2||!SETS[id])return;const m=String(SETS[id].two).match(/^([A-Za-z ]+?) \+(\d+(?:\.\d+)?)%?\.?$/);if(m)put(SET2_KEY[m[1]],+m[2],`${findName(DISCS,id)||"Set"} · 2pc`);else if(id==="329")put("aftershockDmg",15,`${findName(DISCS,id)||"Set"} · 2pc (Aftershock & Dash Attack)`)});
-  SET4_STAT.forEach(r=>{if((counts[r.set]||0)<4)return;if(r.attr==="ether"&&!ETHER_CHARS.has(charId))return;if(r.attr==="lumiflux"&&charId!=="1581")return;put(r.k,r.v,r.label,undefined,undefined,r.mode!=="menu");if(r.mode==="trig")src[src.length-1].trig=true});
+  SET4_STAT.forEach(r=>{if((counts[r.set]||0)<4)return;if(r.attr==="ether"&&!ETHER_CHARS.has(charId))return;if(r.spec&&CHAR_SPEC[charId]!==r.spec)return;if(r.attr==="lumiflux"&&charId!=="1581")return;put(r.k,r.v,r.label,undefined,undefined,r.mode!=="menu");if(r.mode==="trig")src[src.length-1].trig=true});
   let HP0=null;
   const mk=(g,rec)=>{const tot={};
   /* in-combat Max HP% buffs add up and multiply the whole initial Max HP (game: Lucia 23,902 x 1.20 = 28,682) */
@@ -3181,7 +3223,7 @@ function computeBuildStats(charId,wId,wRef,discSet,mind,opts){
   if("sf" in base)tot.sf=base.sf+g("sfFlat");
   if("lac" in base)tot.lac=base.lac+g("lacDmg");
   ELEM_DMG.forEach(([k])=>{const v=g(k);if(v)tot[k]=v});
-  if(!rec)SET4_COND.forEach(r=>{if((counts[r.set]||0)>=4&&r.to in tot&&(tot[r.when]||0)>=r.min){tot[r.to]+=r.add;src.push({k:r.to,v:r.add,from:r.label,pas:true})}});
+  if(!rec)SET4_COND.forEach(r=>{if((counts[r.set]||0)>=4&&!(r.spec&&CHAR_SPEC[charId]!==r.spec)&&r.to in tot&&(tot[r.when]||0)>=r.min){tot[r.to]+=r.add;src.push({k:r.to,v:r.add,from:r.label,pas:true,trig:!!r.trig})}});
   ((CHAR_CONV[charId]||[]).concat("sf" in base?RUPTURE_CONV:[])).forEach(c=>{if(c.cond&&rec)return;if(opts&&opts.noAdd&&/Additional Ability/.test(c.label||""))return;if(/Dmg$/.test(c.to)&&!(c.to in tot))tot[c.to]=0;if(c.to in tot&&c.from in tot){let x=tot[c.from];if(c.over!=null)x=Math.max(0,x-c.over);let v;if(c.per){v=Math.floor(x/c.step+1e-6)*c.per}else{if(c.step)x=Math.floor(x/c.step+1e-6)*c.step;v=x*c.ratio}if(c.max!=null)v=Math.min(c.max,v);if(c.floor)v=Math.floor(v+1e-9);tot[c.to]+=v;if(v&&(c.cond?!rec:rec))src.push({k:c.to,v,from:c.label||"Conversion",pas:!!c.cond,trig:!!c.trig})}});
   return tot};
   const tot=mk(k=>add[k]||0,true),totP=mk(k=>addP[k]||0,false);
@@ -3438,7 +3480,7 @@ function wireSavedBuilds(){
     if(!b.char.id&&!b.discSet.length&&!b.weng.id){$("savedStatus").textContent="Nothing to save — pick a character, add at least one disc to the set, or pick a W-Engine first.";$("savedStatus").className="qsearch-status bad";return}
     const newId=Date.now()+"_"+Math.random().toString(36).slice(2);
     SAVES.push({id:newId,name,ts:Date.now(),...b});
-    persistSaves();$("savedName").value="";DISC_SET=[];renderDiscSet();JUST_SAVED_ID=newId;renderSaves();
+    persistSaves();$("savedName").value="";JUST_SAVED_ID=newId;renderSaves();
     $("savedStatus").textContent=`Saved "${name}".`;$("savedStatus").className="qsearch-status ok";
   };
   $("savedName").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("saveBuildBtn").click()}});

@@ -68,12 +68,44 @@
   wrap.style.cssText = "display:inline-flex;gap:6px;align-items:center";
   const sel = document.createElement("select");
   sel.id = "zonGamePlayer"; sel.title = "Which player's save to replace";
+  sel.className = "zzz-player";
   sel.style.cssText = "width:auto;padding:6px 8px";
   const btn = document.createElement("button");
   btn.id = "zonGamePack"; btn.type = "button"; btn.textContent = "Pack into game";
   btn.title = "Checks the file the way Remielle's server does, backs up the save, then packs this file into it (Remielle's own pack-player).";
   wrap.append(sel, btn);
-  dl.insertAdjacentElement("afterend", wrap);
+
+  // The buttons under the block, in three labeled rows (the website keeps its one row):
+  // this character / the whole file / the game. Same buttons, moved - they keep working as before.
+  const acts = dl.closest(".actions");
+  const byId = id => document.getElementById(id);
+  const css = document.createElement("style");
+  css.textContent = ".zzz-acts{display:flex;flex-direction:column;gap:8px;margin-top:10px}" +
+    ".zzz-acts .zzz-row{display:flex;gap:8px;align-items:flex-start;margin:0}" +
+    ".zzz-acts .zzz-btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center;flex:1;min-width:0}" +
+    ".zzz-acts .zzz-lbl{flex:0 0 112px;color:var(--muted);font-size:.85rem;line-height:38px}" +
+    "@media (max-width:700px){.zzz-acts .zzz-row{flex-direction:column;gap:4px}.zzz-acts .zzz-lbl{flex-basis:auto;line-height:1.4}}";
+  document.head.appendChild(css);
+  const row = (label, els) => {
+    const r = document.createElement("div");
+    r.className = "zzz-row";
+    const l = document.createElement("span");
+    l.className = "zzz-lbl"; l.textContent = label;
+    const b = document.createElement("div");
+    b.className = "zzz-btns";
+    b.append(...els.filter(Boolean));
+    r.append(l, b);
+    return r;
+  };
+  const editSw = byId("zonEditT") ? byId("zonEditT").closest("label") : null;
+  const box = document.createElement("div");
+  box.className = "zzz-acts";
+  box.append(
+    row("This character", [editSw, byId("zonEditApply"), byId("zonApply"), byId("zonCopy")]),
+    row("Whole file", [dl, byId("zonCopyAll"), byId("zonReset"), byId("zonClean")]),
+    row("Game", [wrap]),
+  );
+  if (acts) acts.replaceWith(box); else dl.insertAdjacentElement("afterend", box);
 
   let S = null, arm = 0, busy = false;
   function render(s) {
